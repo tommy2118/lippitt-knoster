@@ -1,0 +1,840 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Managing Complex Change — Lippitt / Knoster Model</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=DM+Sans:wght@400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --ink: #1a1a1a;
+    --paper: #f6f4f0;
+    --warm-white: #faf9f6;
+    --accent: #c4432e;
+    --accent-light: #f2dcd8;
+    --muted: #7a756e;
+    --border: #d9d5ce;
+    --shadow: rgba(26, 26, 26, 0.06);
+    --success: #2d6a4f;
+    --success-bg: #d8f3dc;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--paper);
+    color: var(--ink);
+    line-height: 1.65;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* ---- HEADER ---- */
+  header {
+    max-width: 960px;
+    margin: 0 auto;
+    padding: 80px 32px 48px;
+  }
+
+  header p.kicker {
+    font-family: 'DM Mono', monospace;
+    font-size: 12px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 16px;
+  }
+
+  header h1 {
+    font-family: 'DM Serif Display', serif;
+    font-size: clamp(36px, 5vw, 56px);
+    line-height: 1.1;
+    font-weight: 400;
+    margin-bottom: 20px;
+  }
+
+  header .subtitle {
+    font-size: 18px;
+    color: var(--muted);
+    max-width: 600px;
+    line-height: 1.6;
+  }
+
+  header .attribution {
+    margin-top: 24px;
+    font-family: 'DM Mono', monospace;
+    font-size: 12px;
+    color: var(--muted);
+  }
+
+  /* ---- MAIN GRID ---- */
+  main {
+    max-width: 960px;
+    margin: 0 auto;
+    padding: 0 32px 80px;
+  }
+
+  /* ---- SUCCESS ROW ---- */
+  .success-row {
+    background: var(--warm-white);
+    border: 2px solid var(--success);
+    border-radius: 12px;
+    padding: 32px;
+    margin-bottom: 48px;
+    position: relative;
+  }
+
+  .success-row .row-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--success);
+    margin-bottom: 16px;
+  }
+
+  .ingredients-chain {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+    margin-bottom: 20px;
+  }
+
+  .ingredient-pill {
+    background: var(--success-bg);
+    color: var(--success);
+    border: 1.5px solid var(--success);
+    padding: 8px 18px;
+    border-radius: 6px;
+    font-weight: 600;
+    font-size: 14px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+
+  .ingredient-pill:hover {
+    background: var(--success);
+    color: white;
+  }
+
+  .ingredient-pill.active {
+    background: var(--success);
+    color: white;
+  }
+
+  .chain-arrow {
+    color: var(--success);
+    font-size: 18px;
+    opacity: 0.5;
+  }
+
+  .result-tag {
+    font-family: 'DM Serif Display', serif;
+    font-size: 22px;
+    color: var(--success);
+  }
+
+  /* ---- INGREDIENT DETAIL PANEL ---- */
+  .ingredient-detail {
+    display: none;
+    background: white;
+    border-radius: 8px;
+    padding: 24px;
+    margin-top: 16px;
+    border: 1px solid var(--border);
+    animation: slideIn 0.25s ease;
+  }
+
+  .ingredient-detail.visible {
+    display: block;
+  }
+
+  @keyframes slideIn {
+    from { opacity: 0; transform: translateY(-8px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .ingredient-detail h3 {
+    font-family: 'DM Serif Display', serif;
+    font-size: 20px;
+    margin-bottom: 8px;
+  }
+
+  .ingredient-detail p {
+    color: var(--muted);
+    font-size: 15px;
+    line-height: 1.7;
+  }
+
+  .ingredient-detail .diagnostic {
+    margin-top: 14px;
+    padding: 12px 16px;
+    background: var(--paper);
+    border-radius: 6px;
+    font-family: 'DM Mono', monospace;
+    font-size: 13px;
+    color: var(--ink);
+    border-left: 3px solid var(--success);
+  }
+
+  .ingredient-detail .diagnostic span {
+    display: block;
+    color: var(--muted);
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 4px;
+    font-family: 'DM Sans', sans-serif;
+  }
+
+  /* ---- FAILURE ROWS ---- */
+  .failure-section-header {
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 24px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .failure-row {
+    background: var(--warm-white);
+    border: 1.5px solid var(--border);
+    border-radius: 12px;
+    padding: 28px 32px;
+    margin-bottom: 16px;
+    cursor: pointer;
+    transition: all 0.25s ease;
+    position: relative;
+  }
+
+  .failure-row:hover {
+    border-color: var(--accent);
+    box-shadow: 0 4px 20px var(--shadow);
+  }
+
+  .failure-row.expanded {
+    border-color: var(--accent);
+  }
+
+  .failure-row-top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+  }
+
+  .failure-chain {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    flex-wrap: wrap;
+    flex: 1;
+  }
+
+  .chain-item {
+    padding: 6px 14px;
+    border-radius: 5px;
+    font-size: 13px;
+    font-weight: 500;
+    border: 1px solid var(--border);
+    background: white;
+    color: var(--ink);
+    transition: all 0.2s;
+  }
+
+  .chain-item.missing {
+    border: 1.5px dashed var(--accent);
+    background: var(--accent-light);
+    color: var(--accent);
+    font-weight: 700;
+    position: relative;
+  }
+
+  .chain-item.missing::after {
+    content: '✕';
+    position: absolute;
+    top: -6px;
+    right: -6px;
+    font-size: 10px;
+    background: var(--accent);
+    color: white;
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    line-height: 1;
+  }
+
+  .chain-arrow-sm {
+    color: var(--border);
+    font-size: 14px;
+  }
+
+  .symptom-label {
+    font-family: 'DM Serif Display', serif;
+    font-size: 18px;
+    white-space: nowrap;
+    color: var(--accent);
+    min-width: 120px;
+    text-align: right;
+  }
+
+  .expand-icon {
+    color: var(--muted);
+    font-size: 20px;
+    transition: transform 0.25s;
+    margin-left: 8px;
+  }
+
+  .failure-row.expanded .expand-icon {
+    transform: rotate(180deg);
+  }
+
+  /* ---- EXPANDED CONTENT ---- */
+  .failure-detail {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.4s ease, padding 0.3s ease;
+  }
+
+  .failure-row.expanded .failure-detail {
+    max-height: 600px;
+    padding-top: 24px;
+  }
+
+  .failure-detail-inner {
+    border-top: 1px solid var(--border);
+    padding-top: 20px;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+  }
+
+  .detail-block h4 {
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 8px;
+  }
+
+  .detail-block p {
+    font-size: 14px;
+    color: var(--muted);
+    line-height: 1.65;
+  }
+
+  .signal-list {
+    list-style: none;
+    padding: 0;
+  }
+
+  .signal-list li {
+    font-size: 14px;
+    color: var(--muted);
+    padding: 4px 0;
+    padding-left: 20px;
+    position: relative;
+  }
+
+  .signal-list li::before {
+    content: '→';
+    position: absolute;
+    left: 0;
+    color: var(--accent);
+  }
+
+  /* ---- DIAGNOSTIC TOOL ---- */
+  .diagnostic-section {
+    margin-top: 64px;
+    background: var(--ink);
+    color: var(--paper);
+    border-radius: 16px;
+    padding: 48px;
+  }
+
+  .diagnostic-section h2 {
+    font-family: 'DM Serif Display', serif;
+    font-size: 28px;
+    margin-bottom: 8px;
+  }
+
+  .diagnostic-section .lead {
+    color: rgba(246, 244, 240, 0.6);
+    font-size: 15px;
+    margin-bottom: 32px;
+  }
+
+  .diagnostic-grid {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 12px;
+    margin-bottom: 32px;
+  }
+
+  .diag-toggle {
+    appearance: none;
+    background: rgba(255,255,255,0.08);
+    border: 1.5px solid rgba(255,255,255,0.15);
+    color: rgba(255,255,255,0.7);
+    padding: 14px 8px;
+    border-radius: 8px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    text-align: center;
+    transition: all 0.2s;
+  }
+
+  .diag-toggle:hover {
+    border-color: rgba(255,255,255,0.4);
+    color: white;
+  }
+
+  .diag-toggle.checked {
+    background: var(--success);
+    border-color: var(--success);
+    color: white;
+  }
+
+  .diag-toggle .check-mark {
+    display: block;
+    font-size: 18px;
+    margin-bottom: 4px;
+    opacity: 0.3;
+    transition: opacity 0.2s;
+  }
+
+  .diag-toggle.checked .check-mark {
+    opacity: 1;
+  }
+
+  .diagnosis-output {
+    background: rgba(255,255,255,0.06);
+    border-radius: 10px;
+    padding: 24px;
+    min-height: 80px;
+    transition: all 0.3s;
+  }
+
+  .diagnosis-output .result-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: rgba(246,244,240,0.4);
+    margin-bottom: 10px;
+  }
+
+  .diagnosis-output .result-text {
+    font-family: 'DM Serif Display', serif;
+    font-size: 24px;
+    line-height: 1.3;
+  }
+
+  .diagnosis-output .result-detail {
+    margin-top: 10px;
+    color: rgba(246, 244, 240, 0.6);
+    font-size: 14px;
+    line-height: 1.6;
+  }
+
+  .result-text.change { color: #52b788; }
+  .result-text.confusion { color: #f4845f; }
+  .result-text.anxiety { color: #f4845f; }
+  .result-text.resistance { color: #f4845f; }
+  .result-text.frustration { color: #f4845f; }
+  .result-text.false-start { color: #f4845f; }
+  .result-text.multiple { color: #e9c46a; }
+
+  /* ---- FOOTER ---- */
+  footer {
+    max-width: 960px;
+    margin: 0 auto;
+    padding: 0 32px 64px;
+    text-align: center;
+    font-size: 13px;
+    color: var(--muted);
+  }
+
+  footer a { color: var(--accent); text-decoration: none; }
+
+  /* ---- RESPONSIVE ---- */
+  @media (max-width: 700px) {
+    header { padding: 48px 20px 32px; }
+    main { padding: 0 20px 48px; }
+    .success-row, .failure-row { padding: 20px; }
+    .diagnostic-section { padding: 28px 20px; }
+    .diagnostic-grid { grid-template-columns: repeat(3, 1fr); }
+    .failure-detail-inner { grid-template-columns: 1fr; }
+    .symptom-label { min-width: auto; text-align: left; font-size: 16px; }
+    .failure-row-top { flex-direction: column; align-items: flex-start; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <p class="kicker">Change Management Framework</p>
+  <h1>Managing Complex Change</h1>
+  <p class="subtitle">Every failed change initiative is missing at least one ingredient. The symptom tells you which one. Find the gap, fix the gap, move the work forward.</p>
+  <p class="attribution">Dr. Mary Lippitt (1987) · Anthony Ambrose (1987) · Tim Knoster (1991)</p>
+</header>
+
+<main>
+
+  <!-- SUCCESS ROW -->
+  <div class="success-row">
+    <div class="row-label">All ingredients present</div>
+    <div class="ingredients-chain">
+      <button class="ingredient-pill" data-ingredient="vision" onclick="showIngredient(this)">Vision</button>
+      <span class="chain-arrow">+</span>
+      <button class="ingredient-pill" data-ingredient="skills" onclick="showIngredient(this)">Skills</button>
+      <span class="chain-arrow">+</span>
+      <button class="ingredient-pill" data-ingredient="incentives" onclick="showIngredient(this)">Incentives</button>
+      <span class="chain-arrow">+</span>
+      <button class="ingredient-pill" data-ingredient="resources" onclick="showIngredient(this)">Resources</button>
+      <span class="chain-arrow">+</span>
+      <button class="ingredient-pill" data-ingredient="action-plan" onclick="showIngredient(this)">Action Plan</button>
+      <span class="chain-arrow" style="margin: 0 4px;">→</span>
+      <span class="result-tag">Change</span>
+    </div>
+
+    <div id="detail-vision" class="ingredient-detail">
+      <h3>Vision</h3>
+      <p>The shared understanding of where you're going and why it matters. Not a mission statement on a wall. It's the answer to "what does the world look like when we're done?" that everyone on the team could articulate without reading a slide deck. It creates alignment and gives people a filter for making autonomous decisions.</p>
+      <div class="diagnostic"><span>Diagnostic question</span>Can three random team members describe the end state in their own words, without prompting?</div>
+    </div>
+
+    <div id="detail-skills" class="ingredient-detail">
+      <h3>Skills</h3>
+      <p>The collective capabilities required to execute the vision. Not just technical skills, but also the softer ones: collaboration patterns, communication norms, decision-making frameworks. The question is "can this team actually do what we're asking them to do today, and if not, what's the gap and the plan to close it?"</p>
+      <div class="diagnostic"><span>Diagnostic question</span>If you handed each person their piece of the work today, could they start without asking how?</div>
+    </div>
+
+    <div id="detail-incentives" class="ingredient-detail">
+      <h3>Incentives</h3>
+      <p>The personal reasons people have to participate in the change. Compensation is the obvious one, but it's rarely the main driver. Recognition, career growth, autonomy, reduced pain, intellectual challenge, belonging. The key insight is that incentives are individual, not collective. What motivates your senior engineer is different from what motivates your new hire.</p>
+      <div class="diagnostic"><span>Diagnostic question</span>Can each person answer "what's in it for me?" with something real, not something they were told to say?</div>
+    </div>
+
+    <div id="detail-resources" class="ingredient-detail">
+      <h3>Resources</h3>
+      <p>The tangible inputs required to do the work: budget, headcount, tools, time, infrastructure, access. The critical one people underestimate is time. Asking a team to drive a major change initiative while maintaining their full operational load is a resource gap disguised as a prioritization problem.</p>
+      <div class="diagnostic"><span>Diagnostic question</span>Does the team have dedicated capacity for this, or are they squeezing it between existing obligations?</div>
+    </div>
+
+    <div id="detail-action-plan" class="ingredient-detail">
+      <h3>Action Plan</h3>
+      <p>The concrete, sequenced breakdown of work with owners, timelines, and milestones. It bridges vision and execution. Not a Gantt chart fantasy, but a living plan that answers "what are we doing this week, who's doing it, and how do we know it's working?" Without it, you have intent without movement.</p>
+      <div class="diagnostic"><span>Diagnostic question</span>Does every person know their next concrete task and its deadline, right now?</div>
+    </div>
+  </div>
+
+  <!-- FAILURE MODES -->
+  <div class="failure-section-header">When an ingredient is missing</div>
+
+  <!-- CONFUSION -->
+  <div class="failure-row" onclick="toggleRow(this)">
+    <div class="failure-row-top">
+      <div class="failure-chain">
+        <span class="chain-item missing">Vision</span>
+        <span class="chain-arrow-sm">+</span>
+        <span class="chain-item">Skills</span>
+        <span class="chain-arrow-sm">+</span>
+        <span class="chain-item">Incentives</span>
+        <span class="chain-arrow-sm">+</span>
+        <span class="chain-item">Resources</span>
+        <span class="chain-arrow-sm">+</span>
+        <span class="chain-item">Action Plan</span>
+      </div>
+      <span class="symptom-label">Confusion</span>
+      <span class="expand-icon">▾</span>
+    </div>
+    <div class="failure-detail">
+      <div class="failure-detail-inner">
+        <div class="detail-block">
+          <h4>What you'll see</h4>
+          <ul class="signal-list">
+            <li>People executing tasks without understanding why</li>
+            <li>Conflicting interpretations of goals across teams</li>
+            <li>Lots of activity, unclear if it's the right activity</li>
+            <li>"What exactly are we building?" asked repeatedly</li>
+          </ul>
+        </div>
+        <div class="detail-block">
+          <h4>The intervention</h4>
+          <p>Stop and articulate the end state clearly. Not the plan. The destination. Paint a picture of what success looks like in terms everyone can see themselves in. Then validate: can people repeat it back without reading your words?</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ANXIETY -->
+  <div class="failure-row" onclick="toggleRow(this)">
+    <div class="failure-row-top">
+      <div class="failure-chain">
+        <span class="chain-item">Vision</span>
+        <span class="chain-arrow-sm">+</span>
+        <span class="chain-item missing">Skills</span>
+        <span class="chain-arrow-sm">+</span>
+        <span class="chain-item">Incentives</span>
+        <span class="chain-arrow-sm">+</span>
+        <span class="chain-item">Resources</span>
+        <span class="chain-arrow-sm">+</span>
+        <span class="chain-item">Action Plan</span>
+      </div>
+      <span class="symptom-label">Anxiety</span>
+      <span class="expand-icon">▾</span>
+    </div>
+    <div class="failure-detail">
+      <div class="failure-detail-inner">
+        <div class="detail-block">
+          <h4>What you'll see</h4>
+          <ul class="signal-list">
+            <li>People nodding along in meetings, then not executing</li>
+            <li>Quiet reversion to familiar tools and processes</li>
+            <li>Requests for "more training" or "better documentation"</li>
+            <li>Avoidance of new responsibilities or ownership</li>
+          </ul>
+        </div>
+        <div class="detail-block">
+          <h4>The intervention</h4>
+          <p>Invest in capability before demanding execution. Pair experienced people with those who need support. Create safe environments to practice. Acknowledge the gap openly. People can't perform skills they don't have, no matter how motivated.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- RESISTANCE -->
+  <div class="failure-row" onclick="toggleRow(this)">
+    <div class="failure-row-top">
+      <div class="failure-chain">
+        <span class="chain-item">Vision</span>
+        <span class="chain-arrow-sm">+</span>
+        <span class="chain-item">Skills</span>
+        <span class="chain-arrow-sm">+</span>
+        <span class="chain-item missing">Incentives</span>
+        <span class="chain-arrow-sm">+</span>
+        <span class="chain-item">Resources</span>
+        <span class="chain-arrow-sm">+</span>
+        <span class="chain-item">Action Plan</span>
+      </div>
+      <span class="symptom-label">Resistance</span>
+      <span class="expand-icon">▾</span>
+    </div>
+    <div class="failure-detail">
+      <div class="failure-detail-inner">
+        <div class="detail-block">
+          <h4>What you'll see</h4>
+          <ul class="signal-list">
+            <li>Passive non-compliance disguised as "too busy"</li>
+            <li>People doing the minimum to appear compliant</li>
+            <li>Side conversations questioning the initiative's value</li>
+            <li>Key players quietly disengaging</li>
+          </ul>
+        </div>
+        <div class="detail-block">
+          <h4>The intervention</h4>
+          <p>Have honest conversations about "what's in it for me?" at the individual level. Resistance is rational behavior when the math doesn't work for someone personally. Find the real motivators, not the assumed ones, and connect the change to things each person actually cares about.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- FRUSTRATION -->
+  <div class="failure-row" onclick="toggleRow(this)">
+    <div class="failure-row-top">
+      <div class="failure-chain">
+        <span class="chain-item">Vision</span>
+        <span class="chain-arrow-sm">+</span>
+        <span class="chain-item">Skills</span>
+        <span class="chain-arrow-sm">+</span>
+        <span class="chain-item">Incentives</span>
+        <span class="chain-arrow-sm">+</span>
+        <span class="chain-item missing">Resources</span>
+        <span class="chain-arrow-sm">+</span>
+        <span class="chain-item">Action Plan</span>
+      </div>
+      <span class="symptom-label">Frustration</span>
+      <span class="expand-icon">▾</span>
+    </div>
+    <div class="failure-detail">
+      <div class="failure-detail-inner">
+        <div class="detail-block">
+          <h4>What you'll see</h4>
+          <ul class="signal-list">
+            <li>High energy turning into burnout</li>
+            <li>"We want to do this but we literally can't"</li>
+            <li>Workarounds and shortcuts becoming the norm</li>
+            <li>Blame shifting between teams over shared resources</li>
+          </ul>
+        </div>
+        <div class="detail-block">
+          <h4>The intervention</h4>
+          <p>Either provide the resources or reduce the scope. Telling a motivated, skilled team to "figure it out" without budget, headcount, or time is a trust-destroying move. Be honest about constraints and adjust expectations accordingly. Protected time is often the most impactful resource.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- FALSE START -->
+  <div class="failure-row" onclick="toggleRow(this)">
+    <div class="failure-row-top">
+      <div class="failure-chain">
+        <span class="chain-item">Vision</span>
+        <span class="chain-arrow-sm">+</span>
+        <span class="chain-item">Skills</span>
+        <span class="chain-arrow-sm">+</span>
+        <span class="chain-item">Incentives</span>
+        <span class="chain-arrow-sm">+</span>
+        <span class="chain-item">Resources</span>
+        <span class="chain-arrow-sm">+</span>
+        <span class="chain-item missing">Action Plan</span>
+      </div>
+      <span class="symptom-label">False Start</span>
+      <span class="expand-icon">▾</span>
+    </div>
+    <div class="failure-detail">
+      <div class="failure-detail-inner">
+        <div class="detail-block">
+          <h4>What you'll see</h4>
+          <ul class="signal-list">
+            <li>Lots of kickoff meetings, no tangible output</li>
+            <li>Repeated "resets" and "realignments"</li>
+            <li>Nobody can name the next concrete deliverable</li>
+            <li>Thrashing between priorities week to week</li>
+          </ul>
+        </div>
+        <div class="detail-block">
+          <h4>The intervention</h4>
+          <p>Break the vision into work. Define owners, sequences, and deadlines. Answer "what does done look like?" at every level. A plan doesn't have to be perfect. It has to exist, be concrete enough to act on, and be revisable as you learn.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- DIAGNOSTIC TOOL -->
+  <div class="diagnostic-section">
+    <h2>Diagnose Your Initiative</h2>
+    <p class="lead">Toggle each ingredient your change initiative currently has in place. The model will tell you what to expect.</p>
+
+    <div class="diagnostic-grid">
+      <button class="diag-toggle" data-name="Vision" onclick="toggleDiag(this)">
+        <span class="check-mark">✓</span>
+        Vision
+      </button>
+      <button class="diag-toggle" data-name="Skills" onclick="toggleDiag(this)">
+        <span class="check-mark">✓</span>
+        Skills
+      </button>
+      <button class="diag-toggle" data-name="Incentives" onclick="toggleDiag(this)">
+        <span class="check-mark">✓</span>
+        Incentives
+      </button>
+      <button class="diag-toggle" data-name="Resources" onclick="toggleDiag(this)">
+        <span class="check-mark">✓</span>
+        Resources
+      </button>
+      <button class="diag-toggle" data-name="Action Plan" onclick="toggleDiag(this)">
+        <span class="check-mark">✓</span>
+        Action Plan
+      </button>
+    </div>
+
+    <div class="diagnosis-output" id="diagOutput">
+      <div class="result-label">Prediction</div>
+      <div class="result-text" id="diagResult">Toggle ingredients above</div>
+      <div class="result-detail" id="diagDetail"></div>
+    </div>
+  </div>
+
+</main>
+
+<footer>
+  <p>Based on work by Lippitt, Ambrose, and Knoster. Built as a reference tool, not a prescription.</p>
+</footer>
+
+<script>
+  // Ingredient detail panels
+  function showIngredient(el) {
+    const ingredient = el.dataset.ingredient;
+    const allPills = document.querySelectorAll('.ingredient-pill');
+    const allDetails = document.querySelectorAll('.ingredient-detail');
+
+    const targetDetail = document.getElementById('detail-' + ingredient);
+    const isVisible = targetDetail.classList.contains('visible');
+
+    allPills.forEach(p => p.classList.remove('active'));
+    allDetails.forEach(d => d.classList.remove('visible'));
+
+    if (!isVisible) {
+      el.classList.add('active');
+      targetDetail.classList.add('visible');
+    }
+  }
+
+  // Failure row expand/collapse
+  function toggleRow(row) {
+    const wasExpanded = row.classList.contains('expanded');
+    document.querySelectorAll('.failure-row').forEach(r => r.classList.remove('expanded'));
+    if (!wasExpanded) row.classList.add('expanded');
+  }
+
+  // Diagnostic tool
+  const diagnosisMap = {
+    '11111': { text: 'Change', cls: 'change', detail: 'All ingredients are present. You have the conditions for successful change. Execute, monitor, and adapt.' },
+    '01111': { text: 'Confusion', cls: 'confusion', detail: 'Missing Vision. People have the skills, motivation, resources, and plan, but no shared understanding of where they\'re going. Articulate the destination.' },
+    '10111': { text: 'Anxiety', cls: 'anxiety', detail: 'Missing Skills. People see the vision and want to help, but they don\'t believe they can pull it off. Invest in training, pairing, and safe practice.' },
+    '11011': { text: 'Resistance', cls: 'resistance', detail: 'Missing Incentives. People understand and can execute, but have no personal reason to. Find individual motivators and connect the change to what each person cares about.' },
+    '11101': { text: 'Frustration', cls: 'frustration', detail: 'Missing Resources. A motivated, skilled team starved of what they need. Provide budget, headcount, tools, or time. Or honestly reduce scope.' },
+    '11110': { text: 'False Start', cls: 'false-start', detail: 'Missing Action Plan. All energy, no direction. Break the vision into sequenced, owned, concrete work with clear milestones.' },
+  };
+
+  function toggleDiag(el) {
+    el.classList.toggle('checked');
+    updateDiagnosis();
+  }
+
+  function updateDiagnosis() {
+    const toggles = document.querySelectorAll('.diag-toggle');
+    const state = Array.from(toggles).map(t => t.classList.contains('checked') ? '1' : '0').join('');
+    const resultEl = document.getElementById('diagResult');
+    const detailEl = document.getElementById('diagDetail');
+    const count = state.split('').filter(c => c === '0').length;
+
+    resultEl.className = 'result-text';
+    
+    if (state === '00000') {
+      resultEl.textContent = 'Nothing in place yet';
+      resultEl.classList.add('multiple');
+      detailEl.textContent = 'Every ingredient is missing. Start with Vision. You can\'t build anything until people know what they\'re building toward.';
+    } else if (diagnosisMap[state]) {
+      const d = diagnosisMap[state];
+      resultEl.textContent = d.text;
+      resultEl.classList.add(d.cls);
+      detailEl.textContent = d.detail;
+    } else if (count >= 2) {
+      const names = ['Vision', 'Skills', 'Incentives', 'Resources', 'Action Plan'];
+      const missing = [];
+      state.split('').forEach((v, i) => { if (v === '0') missing.push(names[i]); });
+      resultEl.textContent = 'Compounding Failure';
+      resultEl.classList.add('multiple');
+      detailEl.textContent = 'Missing: ' + missing.join(', ') + '. Multiple gaps compound. People won\'t experience one clean symptom; they\'ll label it "bad leadership" or "bad culture." Address the gaps in order: Vision first, then Skills, Incentives, Resources, Action Plan.';
+    } else {
+      resultEl.textContent = 'Toggle ingredients above';
+      detailEl.textContent = '';
+    }
+  }
+</script>
+
+</body>
+</html>
