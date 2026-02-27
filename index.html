@@ -22,7 +22,7 @@
     --warm-white: #faf9f6;
     --accent: #c4432e;
     --accent-light: #f2dcd8;
-    --muted: #7a756e;
+    --muted: #706b64;
     --border: #d9d5ce;
     --shadow: rgba(26, 26, 26, 0.06);
     --success: #2d6a4f;
@@ -30,6 +30,20 @@
   }
 
   * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  :focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 2px;
+  }
+
+  .failure-row:focus-visible {
+    border-color: var(--accent);
+    box-shadow: 0 4px 20px var(--shadow);
+  }
+
+  .diag-toggle:focus-visible {
+    outline-color: rgba(255,255,255,0.8);
+  }
 
   body {
     font-family: 'DM Sans', sans-serif;
@@ -505,15 +519,15 @@
   <div class="success-row">
     <div class="row-label">All ingredients present</div>
     <div class="ingredients-chain">
-      <button class="ingredient-pill" data-ingredient="vision" onclick="showIngredient(this)">Vision</button>
+      <button class="ingredient-pill" data-ingredient="vision" onclick="showIngredient(this)" aria-expanded="false">Vision</button>
       <span class="chain-arrow">+</span>
-      <button class="ingredient-pill" data-ingredient="skills" onclick="showIngredient(this)">Skills</button>
+      <button class="ingredient-pill" data-ingredient="skills" onclick="showIngredient(this)" aria-expanded="false">Skills</button>
       <span class="chain-arrow">+</span>
-      <button class="ingredient-pill" data-ingredient="incentives" onclick="showIngredient(this)">Incentives</button>
+      <button class="ingredient-pill" data-ingredient="incentives" onclick="showIngredient(this)" aria-expanded="false">Incentives</button>
       <span class="chain-arrow">+</span>
-      <button class="ingredient-pill" data-ingredient="resources" onclick="showIngredient(this)">Resources</button>
+      <button class="ingredient-pill" data-ingredient="resources" onclick="showIngredient(this)" aria-expanded="false">Resources</button>
       <span class="chain-arrow">+</span>
-      <button class="ingredient-pill" data-ingredient="action-plan" onclick="showIngredient(this)">Action Plan</button>
+      <button class="ingredient-pill" data-ingredient="action-plan" onclick="showIngredient(this)" aria-expanded="false">Action Plan</button>
       <span class="chain-arrow" style="margin: 0 4px;">→</span>
       <span class="result-tag">Change</span>
     </div>
@@ -553,7 +567,7 @@
   <div class="failure-section-header">When an ingredient is missing</div>
 
   <!-- CONFUSION -->
-  <div class="failure-row" onclick="toggleRow(this)">
+  <div class="failure-row" onclick="toggleRow(this)" tabindex="0" role="button" aria-expanded="false">
     <div class="failure-row-top">
       <div class="failure-chain">
         <span class="chain-item missing">Vision</span>
@@ -589,7 +603,7 @@
   </div>
 
   <!-- ANXIETY -->
-  <div class="failure-row" onclick="toggleRow(this)">
+  <div class="failure-row" onclick="toggleRow(this)" tabindex="0" role="button" aria-expanded="false">
     <div class="failure-row-top">
       <div class="failure-chain">
         <span class="chain-item">Vision</span>
@@ -625,7 +639,7 @@
   </div>
 
   <!-- RESISTANCE -->
-  <div class="failure-row" onclick="toggleRow(this)">
+  <div class="failure-row" onclick="toggleRow(this)" tabindex="0" role="button" aria-expanded="false">
     <div class="failure-row-top">
       <div class="failure-chain">
         <span class="chain-item">Vision</span>
@@ -661,7 +675,7 @@
   </div>
 
   <!-- FRUSTRATION -->
-  <div class="failure-row" onclick="toggleRow(this)">
+  <div class="failure-row" onclick="toggleRow(this)" tabindex="0" role="button" aria-expanded="false">
     <div class="failure-row-top">
       <div class="failure-chain">
         <span class="chain-item">Vision</span>
@@ -697,7 +711,7 @@
   </div>
 
   <!-- FALSE START -->
-  <div class="failure-row" onclick="toggleRow(this)">
+  <div class="failure-row" onclick="toggleRow(this)" tabindex="0" role="button" aria-expanded="false">
     <div class="failure-row-top">
       <div class="failure-chain">
         <span class="chain-item">Vision</span>
@@ -738,29 +752,29 @@
     <p class="lead">Toggle each ingredient your change initiative currently has in place. The model will tell you what to expect.</p>
 
     <div class="diagnostic-grid">
-      <button class="diag-toggle" data-name="Vision" onclick="toggleDiag(this)">
+      <button class="diag-toggle" data-name="Vision" onclick="toggleDiag(this)" aria-pressed="false">
         <span class="check-mark">✓</span>
         Vision
       </button>
-      <button class="diag-toggle" data-name="Skills" onclick="toggleDiag(this)">
+      <button class="diag-toggle" data-name="Skills" onclick="toggleDiag(this)" aria-pressed="false">
         <span class="check-mark">✓</span>
         Skills
       </button>
-      <button class="diag-toggle" data-name="Incentives" onclick="toggleDiag(this)">
+      <button class="diag-toggle" data-name="Incentives" onclick="toggleDiag(this)" aria-pressed="false">
         <span class="check-mark">✓</span>
         Incentives
       </button>
-      <button class="diag-toggle" data-name="Resources" onclick="toggleDiag(this)">
+      <button class="diag-toggle" data-name="Resources" onclick="toggleDiag(this)" aria-pressed="false">
         <span class="check-mark">✓</span>
         Resources
       </button>
-      <button class="diag-toggle" data-name="Action Plan" onclick="toggleDiag(this)">
+      <button class="diag-toggle" data-name="Action Plan" onclick="toggleDiag(this)" aria-pressed="false">
         <span class="check-mark">✓</span>
         Action Plan
       </button>
     </div>
 
-    <div class="diagnosis-output" id="diagOutput">
+    <div class="diagnosis-output" id="diagOutput" aria-live="polite">
       <div class="result-label">Prediction</div>
       <div class="result-text" id="diagResult">Toggle ingredients above</div>
       <div class="result-detail" id="diagDetail"></div>
@@ -783,11 +797,15 @@
     const targetDetail = document.getElementById('detail-' + ingredient);
     const isVisible = targetDetail.classList.contains('visible');
 
-    allPills.forEach(p => p.classList.remove('active'));
+    allPills.forEach(p => {
+      p.classList.remove('active');
+      p.setAttribute('aria-expanded', 'false');
+    });
     allDetails.forEach(d => d.classList.remove('visible'));
 
     if (!isVisible) {
       el.classList.add('active');
+      el.setAttribute('aria-expanded', 'true');
       targetDetail.classList.add('visible');
     }
   }
@@ -795,9 +813,25 @@
   // Failure row expand/collapse
   function toggleRow(row) {
     const wasExpanded = row.classList.contains('expanded');
-    document.querySelectorAll('.failure-row').forEach(r => r.classList.remove('expanded'));
-    if (!wasExpanded) row.classList.add('expanded');
+    document.querySelectorAll('.failure-row').forEach(r => {
+      r.classList.remove('expanded');
+      r.setAttribute('aria-expanded', 'false');
+    });
+    if (!wasExpanded) {
+      row.classList.add('expanded');
+      row.setAttribute('aria-expanded', 'true');
+    }
   }
+
+  // Keyboard support for failure rows
+  document.querySelectorAll('.failure-row').forEach(row => {
+    row.addEventListener('keydown', function(e) {
+      if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault();
+        toggleRow(this);
+      }
+    });
+  });
 
   // Diagnostic tool
   const diagnosisMap = {
@@ -811,6 +845,7 @@
 
   function toggleDiag(el) {
     el.classList.toggle('checked');
+    el.setAttribute('aria-pressed', el.classList.contains('checked'));
     updateDiagnosis();
   }
 
